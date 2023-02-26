@@ -22,21 +22,38 @@ PeerChat implements a fully functional prototype of a distributed messaging app.
 An online indicator and the last message is shown for each contact. Users can exchange text messages and get acknowledgments when a message is delivered.
 
 <img src="https://user-images.githubusercontent.com/1122874/82873653-1c979280-9f35-11ea-9d47-cea4e134a5b4.png" width="180"> <img src="https://user-images.githubusercontent.com/1122874/82873656-1dc8bf80-9f35-11ea-84b7-7139401560a4.png" width="180"> <img src="https://user-images.githubusercontent.com/1122874/82873659-1ef9ec80-9f35-11ea-95f6-99cbbc0510c9.png" width="180">
- 
+
  <img src="https://user-images.githubusercontent.com/1122874/82873643-1a353880-9f35-11ea-8da3-24ce189c939d.png" width="180"> <img src="https://user-images.githubusercontent.com/1122874/82873661-1f928300-9f35-11ea-9955-6a7488936b02.png" width="180">
+
+### DeToks
+**Decentralised TikTok** skeleton app for the CS4160 Blockchain Engineering (2022/23) course.
 
 ### Digital Euro
 
-The Superapp is connected to the European IBAN Euro system. You can send and receive digital Euros using QR-codes or build-in chat. **Experimental**. Sending Euros is as easy as sending a smiley. We did a test with native implementation of Trustchain and [a digital Euro last week](https://twitter.com/TriblerTeam/status/1367526077422256128). Field test date: 4 March 2021 at 10:30am. The native Android implementation in Kotlin is slowly getting mature. Location: the bar Doerak (with a liquor license! This is a special place, therefore selected as the site for our trail. Shops which sell coffee or closed canisters of alcohol are "essential shops" and therefore open in Corona times.) Loading real money on your phone requires an operational an open source [gateway](https://github.com/rwblokzijl/stablecoin-exchange) of Euros to digital Euros. Discussed in this master thesis issue: https://github.com/Tribler/tribler/issues/4629
+The Superapp is connected to the European IBAN Euro system.
+You can send and receive digital Euros using QR-codes or build-in chat. **Experimental**.
+Sending Euros is as easy as sending a smiley.
+We did a test with native implementation of Trustchain and [a digital Euro last week](https://twitter.com/TriblerTeam/status/1367526077422256128).
+Field test date: 4 March 2021 at 10:30am.
+The native Android implementation in Kotlin is slowly getting mature.
+Location: the bar Doerak (with a liquor license! This is a special place, therefore selected as the site for our trail.
+Shops which sell coffee or closed canisters of alcohol are "essential shops" and therefore open in Corona times.) Loading real money on your phone requires an operational an open source [gateway](https://github.com/rwblokzijl/stablecoin-exchange) of Euros to digital Euros.
+Discussed in this master thesis issue: https://github.com/Tribler/tribler/issues/4629
+
+#### Double Spending mitigation
+Double spending in EuroToken occurs when a malicious user sends a transaction to a wallet, and then sends the same transaction to another wallet whilst the second receiver is not aware of the first transaction.
+This has been mitigated by introducing a web-of-trust, read more about this in the [EuroToken README.MD](eurotoken/README.MD)
 
 Creative Commons CC0 license - share freely:
 
 <IMG src="https://user-images.githubusercontent.com/325224/110597367-c1135a00-8180-11eb-9a75-207f4630ebb4.jpg" width=300>
- 
+
 Zooming into the actual mechanism of QR-Codes (Creative Commons CC0 license - share freely)
 
 <IMG src="https://user-images.githubusercontent.com/325224/110597621-15b6d500-8181-11eb-828a-0f3409b6608c.jpg" width=150>
 <img src="https://user-images.githubusercontent.com/446634/107397810-47e00300-6aff-11eb-8abe-5d345a096ade.jpeg" width=200>
+
+![Demo](eurotoken/images/demo.gif)
 
 ### Debug
 
@@ -80,8 +97,8 @@ The bid and asks can either be generated automatically or manually. Those bids a
 <img src="trustchain-payloadgenerator/GeneratorImages/PayloadFragment.png" width="180"><br />
 [More about Market Bot](trustchain-payloadgenerator/readme.md)
 
-### Luxury Communism
-We build a DAO for a better world. Luxury communism is an Android application built on top of [IPv8](https://github.com/Tribler/kotlin-ipv8) and [Trustchain](https://github.com/Tribler/kotlin-ipv8/blob/master/doc/TrustChainCommunity.md), and is integrated into the [Trustchain Superapp](https://github.com/Tribler/trustchain-superapp). It is a proof-of-concept implementation of a DAO system using Trustchain and Bitcoin. Trustchain is used for communication and bookkeeping while the Bitcoin blockchain is used to have collective multi-signature wallets for each DAO. The content of the app is split up in several tabs:
+### Luxury Socialism
+{_recent events have turned this into_ **really bad naming**} We build a DAO for a better world. Luxury socialism is an Android application built on top of [IPv8](https://github.com/Tribler/kotlin-ipv8) and [Trustchain](https://github.com/Tribler/kotlin-ipv8/blob/master/doc/TrustChainCommunity.md), and is integrated into the [Trustchain Superapp](https://github.com/Tribler/trustchain-superapp). It is a proof-of-concept implementation of a DAO system using Trustchain and Bitcoin. Trustchain is used for communication and bookkeeping while the Bitcoin blockchain is used to have collective multi-signature wallets for each DAO. The content of the app is split up in several tabs:
 * **First Time Launch**: The first time the app is launched, the user must setup his bitcoin wallet. Afterwhich the chain will sync and he is routed to the main screens.
 * **My DAO's**: A list of all DAO's that the user participates in. Selecting a DAO will allow a user to create a transfer proposal from that DAO.
 * **All DAO's**: A list of all discovered DAO's in the network which the user can propose to join.
@@ -89,7 +106,7 @@ We build a DAO for a better world. Luxury communism is an Android application bu
 * **My Wallet**: Overview of the used Bitcoin wallet and the ability to chain this to another.
 * **Duplicate Wallet**: In case the user has wallet files for TestNet, Production or Regtest, the user is allowed to select which one to keep. After the user selected either one, the files belonging to other network type are backed up. This, thus, ensures that the wallet is not lost.
 
-Currently, the Luxury Communism app only allows Regtest, since it uses a future update of Bitcoin called Taproot. Once Taproot is officially released, the app can support TestNet or Production again. Taproot allows the DAO to scale to thousands or even millions of users. The beauty of Taproot is that it uses Schnorr signatures for each transaction. This enables transaction sizes that are equal independent of the number of users in a DAO, since each user combines their signature collaberatively into one for the whole DAO. This also ensures privacy, since it is no longer possible to tell if a transaction's is from a single person, or a million of persons.
+Currently, the Luxury Socialism app only allows Regtest, since it uses a future update of Bitcoin called Taproot. Once Taproot is officially released, the app can support TestNet or Production again. Taproot allows the DAO to scale to thousands or even millions of users. The beauty of Taproot is that it uses Schnorr signatures for each transaction. This enables transaction sizes that are equal independent of the number of users in a DAO, since each user combines their signature collaberatively into one for the whole DAO. This also ensures privacy, since it is no longer possible to tell if a transaction's is from a single person, or a million of persons.
 
 <img src="currencyii/docs/images/screenshot_7.png" width="200px"> <img src="currencyii/docs/images/screenshot_6.png" width="200px"> <img src="currencyii/docs/images/screenshot_10.png" width="200px">
 <br />
@@ -104,7 +121,7 @@ Currently, the Luxury Communism app only allows Regtest, since it uses a future 
 https://user-images.githubusercontent.com/23526224/116259903-85efd900-a776-11eb-93b1-384936d215c4.mp4
 
 
-[More about Luxury Communism](currencyii/README.md)
+[More about Luxury Socialism](currencyii/README.md)
 
 ### TrustChain Voter
 The TrustChain Voter can be used to create a proposal on which the community can vote. The functionality has been split up in two parts: a Voting API, which provides the core voting functionality, and a TrustChain Voter submodule, which serves to demonstrate the capabilities of the voting API. Below, the process of creating a proposal (left) and casting a vote (right) can be seen.
@@ -116,11 +133,11 @@ The TrustChain Voter can be used to create a proposal on which the community can
 
 ### Freedom-of-Computing App
 
-Freedom-of-Computing is an extension-app of the trustchain app. It enables the users to share files in the forms of torrents, through a torrent peer-to-peer (P2P) network, which is the same peer-to-peer network that we call "DemoCommunity" within the app. More specifically though, the purpose of the torrent network is to enable users to freely distribute code in the form of .apk files. The code can be uploaded (seeded) and downloaded by the users, who can then dynamically load that code and execute it. The code, apart from being an .apk file, needs to have a specific format for its execution to work, the requirements/constraints are listed below.
+Freedom-of-Computing provides users with the ability to freely distribute and execute code in the form of APK applications on the trustchain superapp. In order to facilitate the sharing of applications, Freedom-of-Computing contains a gossiping mechanism which periodically shares local applications to other users and downloads unseen applications from other users. This sharing is conducted through a torrent peer-to-peer (P2P) network and uses the EVA Protocol as a fallback. Once the application has been downloaded by the users, they can dynamically load and execute it. The application, apart from being an .APK file, needs to have a specific format for the execution to work, the requirements/constraints are listed inside [the documentation](freedomOfComputing/README.md).
 
 The left demo shows the upload procedure, while the right demo shows the download and code execution procedure.
 
-<img src="doc/freedomOfComputing/demo1.gif" width="280"> <img src="doc/freedomOfComputing/demo2.gif" width="280">
+<img src="doc/freedomOfComputing/create_torrent.gif" width="280"> <img src="doc/freedomOfComputing/download_seeded_apk.gif" width="280">
 
 [More about Freedom-of-Computing App](freedomOfComputing/README.md)
 
@@ -146,15 +163,40 @@ Video 1: <a href="doc/musicdao/thesis2.mp4">Load example.</a> This uses a defaul
 Video 2: <a href="doc/musicdao/thesis3.mp4">Share track.</a> Note: as a fresh magnet link is generated in this video, there is only 1 peer. For this reason it will be difficult to obtain the metadata of the magnet link (cold start issue, write about this in thesis) so the video stops there.
 
 ### Federated, privacy-preserving music recommendations via gossiping
- 
-This is a demonstration of machine learning which relies exclusively on edge computing. Music recommendation inside the MusicDAO is used to demonstrate gossip-based machine learning. 
- 
+
+This is a demonstration of machine learning which relies exclusively on edge computing. Music recommendation inside the MusicDAO is used to demonstrate gossip-based machine learning.
+
 Every time a user opens MusicDAO, they are asked to reload the page in order to get recommendations. The recommendation engine yields two recommendations made by two different models: a musical feature-based model and a collaborative filtering model. The collaborative filtering model is based on federated matrix factorization as introduced in [this paper](https://dmle.iais.fraunhofer.de/papers/hegedus2019decentralized.pdf). The feature-based models are from this [paper](https://arxiv.org/pdf/1109.1396.pdf), called Adaline and Pegasos. These models are trained on audio features extracted from music files with the [Essentia library](https://essentia.upf.edu/).
 <img src="gossipML/docs/imgs/overview.png" height="400px">
- 
+
 The feature-based models are gossiped along random walks through the network. At each peer they are merged and re-trained on peer's local data. The matrix factorization model seeks to learn a factorization of the user-song matrix. This means that one of the two factors contains only information on how users generally rate each song. This matrix can then be gossiped around the network while a user's personal vector as well as their listening history are kept private.
  - [More about federated machine learning using gossiping for music recommendations](gossipML/README.md)
- 
+
+### Atomic Swap
+
+AtomicSwap app allows two users to exchange different cryptocurrencies without the involvement of a third party and without having to trust each other. This is achieved by implementing the Atomic Swap protocol.
+
+User can create trade offers by sending Ipv8 messages indicating that they wish to trade to the Swap community. Others can then accept the offer by sending another Ipv8 message. The swap procedure starts when the initiator receives an accept message for their trade offer.
+
+Below is a video demo that shows the steps to do an atomic swap.
+
+<a href="https://user-images.githubusercontent.com/21971137/164297537-e8b4ff5f-a999-4e6d-b1e8-17135399848e.mp4" title="Swap Demo"><img src="https://user-images.githubusercontent.com/21971137/164298818-a152b7ca-6ebe-4038-a449-e6a246c7f1ab.png" alt="Alternate Text" /></a>
+
+[More about The Atomic Swap app](atomic-swap/README.md)
+
+### Literature Dao
+
+LiteratureDao app aims to be a decentralized scientific literature repository, proving:
+Sharing, storing, and searching of scientific publications through the p2p ipv8 network.
+
+![local_upload](https://user-images.githubusercontent.com/33283063/167591620-a9547f63-e778-4ea9-a594-a7d1d9a4f169.gif)
+![peers](https://user-images.githubusercontent.com/33283063/167591634-6e0b8aaf-11c8-4ee7-b36d-616255fa5347.PNG)
+![search_in_keywords](https://user-images.githubusercontent.com/33283063/167591635-a68c0d2c-16de-4a44-ba73-fc52688252eb.gif)
+![url_upload](https://user-images.githubusercontent.com/33283063/167591643-75a305ae-2098-4138-9f60-14818f63000e.gif)
+
+
+[More about literature dao app](literaturedao/README.md)
+
 ### Do you want to add your own app?
 
 - [Adding your own app to the TrustChain Super App](doc/AppTutorial.md)

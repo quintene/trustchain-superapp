@@ -15,15 +15,17 @@ import nl.tudelft.ipv8.keyvault.defaultCryptoProvider
 import nl.tudelft.ipv8.util.hexToBytes
 import nl.tudelft.ipv8.util.toHex
 import nl.tudelft.trustchain.common.bitcoin.WalletService
+import nl.tudelft.trustchain.common.eurotoken.blocks.EuroTokenCheckpointValidator
+import nl.tudelft.trustchain.common.eurotoken.blocks.EuroTokenDestructionValidator
+import nl.tudelft.trustchain.common.eurotoken.blocks.EuroTokenRollBackValidator
+import nl.tudelft.trustchain.common.eurotoken.blocks.EuroTokenTransferValidator
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
 import org.bitcoinj.wallet.SendRequest
-import nl.tudelft.trustchain.common.eurotoken.blocks.*
 import nl.tudelft.trustchain.common.util.TrustChainHelper
 import java.lang.Math.abs
 import java.math.BigInteger
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class TransactionRepository(
     val trustChainCommunity: TrustChainCommunity,
     val gatewayStore: GatewayStore
@@ -410,9 +412,9 @@ class TransactionRepository(
         return block
     }
 
-    fun getTransactions(): List<Transaction> {
+    fun getTransactions(limit: Int = 1000): List<Transaction> {
         val myKey = trustChainCommunity.myPeer.publicKey.keyToBin()
-        return trustChainCommunity.database.getLatestBlocks(myKey, 1000)
+        return trustChainCommunity.database.getLatestBlocks(myKey, limit)
             .filter { block: TrustChainBlock -> EUROTOKEN_TYPES.contains(block.type) }
             .map { block: TrustChainBlock ->
                 val sender = defaultCryptoProvider.keyFromPublicBin(block.publicKey)

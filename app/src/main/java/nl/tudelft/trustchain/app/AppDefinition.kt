@@ -3,8 +3,9 @@ package nl.tudelft.trustchain.app
 import android.app.Activity
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.example.musicdao.MusicService
+import nl.tudelft.trustchain.musicdao.MusicActivity
 import nl.tudelft.trustchain.FOC.MainActivityFOC
+import nl.tudelft.trustchain.atomicswap.AtomicSwapActivity
 import nl.tudelft.trustchain.common.R
 import nl.tudelft.trustchain.explorer.ui.TrustChainExplorerActivity
 import nl.tudelft.trustchain.currencyii.CurrencyIIMainActivity
@@ -13,19 +14,28 @@ import nl.tudelft.trustchain.distributedAI.DistributedActivity
 import nl.tudelft.trustchain.eurotoken.EuroTokenMainActivity
 import nl.tudelft.trustchain.ssi.SSIMainActivity
 import nl.tudelft.trustchain.liquidity.LiquidityPoolMainActivity
+import nl.tudelft.trustchain.literaturedao.LiteratureDaoActivity
 import nl.tudelft.trustchain.payloadgenerator.ui.TrustChainPayloadGeneratorActivity
 import nl.tudelft.trustchain.peerchat.PeerChatActivity
 import nl.tudelft.trustchain.trader.ui.TrustChainTraderActivity
 import nl.tudelft.trustchain.valuetransfer.ValueTransferMainActivity
 import nl.tudelft.trustchain.voting.VotingActivity
+import nl.tudelft.trustchain.detoks.DeToksActivity
 
 enum class AppDefinition(
     @DrawableRes val icon: Int,
     val appName: String,
     @ColorRes val color: Int,
     val activity: Class<out Activity>,
-    val disableImageTint: Boolean = false
+    val disableImageTint: Boolean = false,
 ) {
+    DETOKS(
+        R.drawable.ic_detox_logo,
+        "DeToks",
+        R.color.black,
+        DeToksActivity::class.java,
+        true,
+    ),
     EIGHTEEN_PLUS(
         R.drawable.ic_18_plus,
         "18+",
@@ -91,7 +101,7 @@ enum class AppDefinition(
         android.R.drawable.ic_media_play,
         "MusicDAO",
         R.color.black,
-        MusicService::class.java
+        MusicActivity::class.java
     ),
     EUROTOKEN(
         R.drawable.ic_baseline_euro_symbol_24,
@@ -106,10 +116,22 @@ enum class AppDefinition(
         LiquidityPoolMainActivity::class.java
     ),
     VALUETRANSFER(
-        R.drawable.ic_confidapp_logo,
-        "ConfIDapp",
+        R.drawable.ic_idelft_logo,
+        "IDelft",
         R.color.colorPrimaryValueTransfer,
         ValueTransferMainActivity::class.java,
         true,
-    )
+    ),
+    ATOMIC_SWAP(
+        R.drawable.ic_atomic_swap_24dp,
+        "Atomic Swap",
+        R.color.blue,
+        AtomicSwapActivity::class.java
+    ),
+    LITERATUREDAO(
+        R.drawable.ic_book_hover_over_hand,
+        "LiteratureDao",
+        R.color.green,
+        LiteratureDaoActivity::class.java
+    ),
 }
