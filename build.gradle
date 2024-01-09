@@ -43,6 +43,7 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        mavenLocal()
     }
 
     // Temp fix for issue https://github.com/mockk/mockk/issues/281

@@ -2,34 +2,30 @@ package nl.tudelft.trustchain.peerai
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.SearchView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.annotation.RequiresApi
 import android.widget.*
-import androidx.core.net.toUri
-import kotlinx.android.synthetic.main.fragment_peer_a_i.results
-import kotlinx.android.synthetic.main.fragment_peer_a_i.searchview
-import nl.tudelft.trustchain.common.ui.BaseFragment
-import org.apache.commons.text.similarity.CosineSimilarity
-import com.squareup.picasso.Picasso
+import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.Gson
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.squareup.picasso.Picasso
+import nl.tudelft.trustchain.common.ui.BaseFragment
 
-import java.io.File
-import java.io.IOException
-import java.lang.Math.sqrt
-import java.util.ArrayList
 
 data class Album(val artist: String, val title: String, val year: String, val tags: List<String>, val magnet: String, val songs: List<String>, val payment: String, val author_image: String,val artwork: String,val author_description: String, val author_upcoming: List<Event>)
+
+
+
+data class YoutubeItem(val artist: String, val title: String, val id: String)
 
 data class Event(val context: String, val type: String, val startDate:String, val offers:String, val name:String, val location: Location);
 data class Location(val type: String, val addressLocality:String)
@@ -37,11 +33,20 @@ data class Location(val type: String, val addressLocality:String)
 class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
 
 
+    private lateinit var textSearcherClient: TextSearcherClient;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        try {
+            val t = TextSearcherClient.create(requireContext());
+            if (t!= null) {
+                textSearcherClient =t;
+            }
 
+        } catch (exception: Exception ) {
+            var test = "";
+        }
 
     }
 
@@ -55,9 +60,9 @@ class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
         // on below line we are initializing adapter for our list view.
         val view: View = inflater.inflate(R.layout.fragment_peer_a_i, container, false)
 
-        view.findViewById<ListView>(R.id.results).adapter = AlbumAdapter(
+        view.findViewById<ListView>(R.id.results).adapter = YoutubeAdapter(
             requireContext(),
-            emptyList<Album>()
+            emptyList<YoutubeItem>()
             )
 
 
@@ -77,19 +82,31 @@ class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
                 // new text on below line.
 
 
-                val list = searchAlbums(newText);
+                try {
+                    var results = listOf<Result>();
 
-                val adapter = AlbumAdapter(requireContext(), list)
-                view.findViewById<ListView>(R.id.results).adapter = adapter;
-                /*view.findViewById<ListView>(R.id.results).adapter = ArrayAdapter<String?>(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    listOf("sdas test")
-                )
-                */
+                    if (newText.length != 0) {
+                        results = textSearcherClient.search(newText);
+                    }
+                    val gson = Gson()
+                    val songs = ArrayList<YoutubeItem>();
+
+                    for (res in results) {
+                        val song = gson.fromJson(res.url, YoutubeItem::class.java)
+                        songs.add(song);
+                    }
 
 
-                (view.findViewById<ListView>(R.id.results).adapter as AlbumAdapter).notifyDataSetChanged();
+                    val adapter = YoutubeAdapter(requireContext(), songs);
+                    view.findViewById<ListView>(R.id.results).adapter = adapter;
+
+                    (view.findViewById<ListView>(R.id.results).adapter as YoutubeAdapter).notifyDataSetChanged();
+
+                }catch (e : Exception) {
+                    var test = "";
+                }
+
+
                 return false
             }
         });
@@ -107,54 +124,10 @@ class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
     }
 
 
-    fun calculateCosineSimilarity(query: List<String>, document: List<String>): Double {
-        val queryTermFrequency = query.groupingBy { it }.eachCount()
-        val documentTermFrequency = document.groupingBy { it }.eachCount()
-
-        val dotProduct = queryTermFrequency.entries.sumOf { (term, frequency) ->
-            (frequency * (documentTermFrequency[term] ?: 0))
-        }
-
-        val queryVectorLength = sqrt(queryTermFrequency.values.sumOf { it * it }.toDouble())
-        val documentVectorLength = sqrt(documentTermFrequency.values.sumOf { it * it }.toDouble())
-
-        return if (queryVectorLength > 0 && documentVectorLength > 0) {
-            dotProduct / (queryVectorLength * documentVectorLength)
-        } else {
-            0.0
-        }
-    }
-
-    fun searchAlbums(query: String): List<Album> {
-        val queryTerms = query.toLowerCase().split(" ");
-        val threshold = 0.15;
-
-        this.context?.let {
-            val albums = loadJsonFromAsset(it.applicationContext);
-            val list =  albums.filter { album ->
-                val documentTerms = (album.artist + " " + album.title + " " + album.tags.joinToString(" ") + " " +
-                    album.songs.joinToString(" ")).toLowerCase().split(" ")
-                val similarityScore = calculateCosineSimilarity(queryTerms, documentTerms)
-                similarityScore >= threshold
-            }
-
-            return list;
-        }
-        return emptyList();
-    }
-
-
-    fun loadJsonFromAsset(context: Context): List<Album> {
-        val jsonFileString = context.assets.open("scraped_data_02.json").bufferedReader().use {
-            it.readText()
-        }
-
-        val gson = Gson()
-        return gson.fromJson(jsonFileString, Array<Album>::class.java).toList()
-    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun findMostSimilarItems(query: String, threshold: Double): List<String> {
@@ -180,20 +153,118 @@ class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
 
         return sortedItems*/
 
-        return  listOf("asasd");
+        return  listOf("");
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    fun createTermFrequencyVector(str: String): MutableMap<CharSequence, Int> {
-        val vector = mutableMapOf<CharSequence, Int>()
 
-        // Split the string into words and count their occurrences
-        for (word in str.toLowerCase().split(" ")) {
-            vector[word] = vector.getOrDefault(word, 0) + 1
+    class YoutubeAdapter(private val context: Context, private val arrayList: List<YoutubeItem>) : BaseAdapter() {
+        private lateinit var titleTextView: TextView
+        private lateinit var authorTextView: TextView
+
+        override fun getCount(): Int {
+            return arrayList.size
         }
 
-        return vector
+        override fun getItem(position: Int): Any {
+            return position
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
+            var convertView = convertView
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_youtube, parent, false)
+
+            // On Click play youtube url
+            convertView.setOnClickListener {
+                val item = arrayList[position]
+
+                // Start Youtube Item activity with item which is unique class
+
+                val intent = Intent(context, YoutubeItemActivity::class.java);
+                intent.putExtra("title", item.title)
+                intent.putExtra("artist", item.artist)
+                intent.putExtra("id", item.id)
+                startActivity(context, intent, Bundle())
+
+
+
+                //showURLDialog(context, item)
+            }
+
+            titleTextView = convertView.findViewById(R.id.titleTextView)
+            authorTextView = convertView.findViewById(R.id.authorTextView)
+
+            titleTextView.text = " " + arrayList[position].title
+            authorTextView.text = " " + arrayList[position].artist
+
+
+            return convertView
+        }
+
+        private fun showURLDialog(context: Context, item: YoutubeItem) {
+            val dialog = Dialog(context)
+            dialog.setContentView(R.layout.youtubeitem_info)
+
+
+            // pass videoId to youtube player view to play video
+            val youTubePlayerView: YouTubePlayerView = dialog.findViewById(R.id.youtube_player_view)
+            // pass videoId to youTubePlayerView to play video
+            youTubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
+                override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
+                    // do stuff with it
+                    if (item.id != null) {
+                        youTubePlayer.loadVideo(item.id, 0f)
+                    }
+                }
+            })
+
+            //getLifecycle().addObserver(youTubePlayerView);
+            /*
+                YouTubePlayerTracker tracker = new YouTubePlayerTracker();
+                youTubePlayer.addListener(tracker);
+
+
+                youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                    // do stuff with it
+                    youTubePlayer.loadVideo(videoId, 0f)
+
+                });*/
+
+                /*
+                youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(@NonNull youTubePlayer: YouTubePlayer) {
+                        if (videoId != null) {
+                            youTubePlayer.loadVideo(videoId, 0f)
+                        }
+                    }
+                })
+            */
+
+            //magnetTextView.text = album.magnet
+            //authorDescriptionTextView.text = album.author_description
+            //yearTextView.text = album.year
+
+            dialog.show()
+        }
+
+        fun extractVideoId(url: String): String? {
+            val key = "v="
+            val index = url.indexOf(key)
+
+            return if (index != -1) {
+                val startIndex = index + key.length
+                val endIndex = url.indexOf('&', startIndex).takeIf { it != -1 } ?: url.length
+                url.substring(startIndex, endIndex)
+            } else {
+                null
+            }
+        }
     }
+
+
 
     //Class MyAdapter
     class AlbumAdapter(private val context: Context, private val arrayList: List<Album>) : BaseAdapter() {
@@ -255,6 +326,7 @@ class PeerAIFragment : BaseFragment(R.layout.fragment_peer_a_i) {
 
             dialog.show()
         }
+
 
     }
 
